@@ -2,7 +2,37 @@
 A 64-bit version of Bevy Transform that enhances precision and minimizes floating-point errors in large-scale projects. This custom implementation substitutes Transform with DTransform and GlobalTransform with DGlobalTransform. The original GlobalTransform is retained for rendering purposes.
 
 # Usage
-To use Bevy Transform64 in your project, you must define the WorldOrigin manually. This should be set as the camera position or the camera entity.
+To integrate Bevy Transform64 into your project, follow these steps:
+
+1. Add DTransformPlugin to your Bevy app:
+
+```
+App::new()
+    .add_plugins(DefaultPlugins)
+    .add_plugin(DTransformPlugin)
+    .run();
+```
+
+2. Define the WorldOrigin resource and set it to the camera position or camera entity:
+
+```
+let camera = commands.spawn(Camera3dBundle {
+    ..Default::default()
+}).insert(DTransformBundle::from_transform(DTransform::from_xyz(5.0, 0.0, 5.0).looking_at(DVec3::ZERO, DVec3::Y))).id();
+commands.insert_resource(WorldOrigin::Entity(camera));
+```
+
+3. Use DTransform for transformations and apply it to entities by inserting the DTransformBundle. For example, to create a cube with a DTransform:
+
+
+```
+let base_cube = commands.spawn(PbrBundle {
+    mesh: mesh.clone(),
+    material: material.clone(),
+    visibility : Visibility::Visible,
+    ..Default::default()
+}).insert(DTransformBundle::from_transform(DTransform::from_xyz(0.0, 0.0, 0.0))).id();
+```
 
 # Example
 Here's an example demonstrating how to use Bevy Transform64:
