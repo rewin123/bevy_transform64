@@ -1,14 +1,11 @@
 # bevy_transform64
-64 bit version of bevy transform
+A 64-bit version of Bevy Transform that enhances precision and minimizes floating-point errors in large-scale projects. This custom implementation substitutes Transform with DTransform and GlobalTransform with DGlobalTransform. The original GlobalTransform is retained for rendering purposes.
 
-It replaced Transform -> DTransform and GlobalTransform -> DGlobalTransform.
+# Usage
+To use Bevy Transform64 in your project, you must define the WorldOrigin manually. This should be set as the camera position or the camera entity.
 
-All objects have 3 tranbsform objects: DTransform, DGlobalTransform, GlobalTransform.
-
-GlobalTransform used for rendering.
-You must manually define WorldOrigin, which must be set as camera poistion or camera entity.
-
-Example usage:
+# Example
+Here's an example demonstrating how to use Bevy Transform64:
 
 ```
 use bevy::{prelude::*, math::DVec3};
