@@ -2,7 +2,6 @@ use std::ops::Mul;
 
 use bevy::math::*;
 use bevy::prelude::*;
-
 use super::DGlobalTransform;
 
 #[derive(Component, Debug, PartialEq, Clone, Copy, Reflect, FromReflect, serde::Serialize, serde::Deserialize)]
