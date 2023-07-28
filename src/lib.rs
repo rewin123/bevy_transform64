@@ -1,6 +1,6 @@
 use std::mem::replace;
 
-use bevy::{prelude::*, math::*};
+use bevy::{prelude::*, math::*, ecs::schedule::ScheduleLabel};
 
 pub mod commands;
 pub mod components;
@@ -66,7 +66,7 @@ impl From<DTransform> for DTransformBundle {
 }
 
 /// Set enum for the systems relating to transform propagation
-#[derive(Debug, Hash, PartialEq, Eq, Clone, SystemSet)]
+#[derive(Debug, Hash, PartialEq, Eq, Clone, SystemSet, ScheduleLabel)]
 pub enum DTransformSystem {
     /// Propagates changes in transform to children's [`GlobalTransform`](crate::components::GlobalTransform)
     TransformPropagate,
@@ -93,14 +93,14 @@ impl Plugin for DTransformPlugin {
             .insert_resource(WorldOrigin::Position(DVec3::ZERO))
             .insert_resource(SimpleWorldOrigin {origin : DVec3::ZERO})
             // add transform systems to startup so the first update is "correct"
-            .configure_set(DTransformSystem::TransformPropagate.in_base_set(CoreSet::PostUpdate))
-            .configure_set(SyncTransforms.in_base_set(CoreSet::PostUpdate)
+            .configure_set(PostUpdate, DTransformSystem::TransformPropagate)
+            .configure_set(PostUpdate, SyncTransforms
                     .after(DTransformSystem::TransformPropagate)
                     .after(bevy::transform::TransformSystem::TransformPropagate))
-            .configure_set(PropagateTransformsSet.in_set(DTransformSystem::TransformPropagate))
-            .edit_schedule(CoreSchedule::Startup, |schedule| {
+            .configure_set(PostUpdate, PropagateTransformsSet.in_set(DTransformSystem::TransformPropagate))
+            .edit_schedule(Startup, |schedule| {
                 schedule.configure_set(
-                    DTransformSystem::TransformPropagate.in_base_set(StartupSet::PostStartup),
+                    DTransformSystem::TransformPropagate
                 );
             })
             .add_startup_systems((
@@ -112,6 +112,8 @@ impl Plugin for DTransformPlugin {
                     .ambiguous_with(PropagateTransformsSet),
                 propagate_transforms.in_set(PropagateTransformsSet),
             ))
+            .add_systems(DTransformSystem::TransformPropagate, sync_simple_transforms.ambiguous_with(PropagateTransformsSet))
+
             .add_systems((
                 sync_simple_transforms
                     .in_set(DTransformSystem::TransformPropagate)

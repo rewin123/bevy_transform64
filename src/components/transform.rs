@@ -4,7 +4,7 @@ use bevy::math::*;
 use bevy::prelude::*;
 use super::DGlobalTransform;
 
-#[derive(Component, Debug, PartialEq, Clone, Copy, Reflect, FromReflect, serde::Serialize, serde::Deserialize)]
+#[derive(Component, Debug, PartialEq, Clone, Copy, Reflect, serde::Serialize, serde::Deserialize)]
 #[reflect(Component, Default, PartialEq)]
 pub struct DTransform {
     /// Position of the entity. In 2d, the last value of the `Vec3` is used for z-ordering.

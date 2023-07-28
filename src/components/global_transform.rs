@@ -5,7 +5,7 @@ use bevy::prelude::*;
 
 use super::DTransform;
 
-#[derive(Component, Debug, PartialEq, Clone, Copy, Reflect, FromReflect, serde::Serialize, serde::Deserialize)]
+#[derive(Component, Debug, PartialEq, Clone, Copy, Reflect, serde::Serialize, serde::Deserialize)]
 #[reflect(Component, Default, PartialEq)]
 pub struct DGlobalTransform (DAffine3);
 
