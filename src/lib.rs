@@ -112,9 +112,9 @@ impl Plugin for DTransformPlugin {
                     .ambiguous_with(PropagateTransformsSet),
                 propagate_transforms.in_set(PropagateTransformsSet),
             ))
-            .add_systems(DTransformSystem::TransformPropagate, sync_simple_transforms.ambiguous_with(PropagateTransformsSet))
+            .add_systems(PostUpdate , sync_simple_transforms.ambiguous_with(PropagateTransformsSet).in_set(DTransformSystem::TransformPropagate))
             .add_systems(PostUpdate, propagate_transforms.in_set(PropagateTransformsSet))
             .add_systems(PostUpdate, sync_f64_f32.in_set(SyncTransforms))
-            .add_systems(DTransformSystem::TransformPropagate, convert_world_origin.after(sync_simple_transforms));
+            .add_systems(PostUpdate, convert_world_origin.after(sync_simple_transforms).in_set(DTransformSystem::TransformPropagate));
     }
 }
