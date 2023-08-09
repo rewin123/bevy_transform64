@@ -1,4 +1,4 @@
-use std::mem::replace;
+use std::{mem::replace, convert};
 
 use bevy::{prelude::*, math::*, ecs::schedule::ScheduleLabel};
 
@@ -89,7 +89,7 @@ impl Plugin for DTransformPlugin {
 
         app.register_type::<DTransform>()
             .register_type::<DGlobalTransform>()
-            .add_plugin(ValidParentCheckPlugin::<DGlobalTransform>::default())
+            .add_plugins(ValidParentCheckPlugin::<DGlobalTransform>::default())
             .insert_resource(WorldOrigin::Position(DVec3::ZERO))
             .insert_resource(SimpleWorldOrigin {origin : DVec3::ZERO})
             // add transform systems to startup so the first update is "correct"
@@ -103,7 +103,7 @@ impl Plugin for DTransformPlugin {
                     DTransformSystem::TransformPropagate
                 );
             })
-            .add_startup_systems((
+            .add_systems(Startup,(
                 sync_simple_transforms
                     .in_set(DTransformSystem::TransformPropagate)
                     // FIXME: https://github.com/bevyengine/bevy/issues/4381
@@ -113,14 +113,8 @@ impl Plugin for DTransformPlugin {
                 propagate_transforms.in_set(PropagateTransformsSet),
             ))
             .add_systems(DTransformSystem::TransformPropagate, sync_simple_transforms.ambiguous_with(PropagateTransformsSet))
-
-            .add_systems((
-                sync_simple_transforms
-                    .in_set(DTransformSystem::TransformPropagate)
-                    .ambiguous_with(PropagateTransformsSet),
-                propagate_transforms.in_set(PropagateTransformsSet),
-                sync_f64_f32.in_set(SyncTransforms),
-                convert_world_origin.after(sync_simple_transforms).in_set(DTransformSystem::TransformPropagate)
-            ));
+            .add_systems(PostUpdate, propagate_transforms.in_set(PropagateTransformsSet))
+            .add_systems(PostUpdate, sync_f64_f32.in_set(SyncTransforms))
+            .add_systems(DTransformSystem::TransformPropagate, convert_world_origin.after(sync_simple_transforms));
     }
 }
